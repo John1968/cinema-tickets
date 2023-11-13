@@ -30,7 +30,7 @@ export default class RequestValidationService {
             ticketsByType = this.calculationService.getTotalTicketsByType(ticketTypeRequests);
             totalTicketsRequired = this.calculationService.getTotalTicketCount(ticketsByType);
             if(totalTicketsRequired > MAX_TICKETS || totalTicketsRequired < MIN_TICKETS) {
-                message = `Your reservation must be for between ${MIN_TICKETS} and ${MAX_TICKETS} tickets. You requested ${totalTicketsRequired}`;
+                message = `Your reservation must be for between ${MIN_TICKETS} and ${MAX_TICKETS} tickets.`;
             } else if(!ticketsByType.ADULT || ticketsByType.ADULT < MIN_TICKETS) {
                 message = 'Your reservation must contain at least 1 adult';
             } else if(ticketsByType.ADULT < ticketsByType.INFANT) {

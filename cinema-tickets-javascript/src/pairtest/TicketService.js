@@ -31,6 +31,7 @@ export default class TicketService {
     // validate the request
     try {
       this.#requestValidationService.requestIdValidator(accountId);
+      this.#requestValidationService.ticketTypeRequestValidator(...ticketTypeRequests)
     } catch(err) {
       logger.error(err.message);
       throw new InvalidPurchaseException(err.message)
