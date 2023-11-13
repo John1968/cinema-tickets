@@ -11,3 +11,6 @@ export const TICKET_BOOKING_CONSTANTS = {
     CHILD: {type: 'CHILD', cost: 10},
     INFANT: {type: 'INFANT', cost: 0},
 };
+
+export const MAX_TICKETS = 20;
+export const MIN_TICKETS = 1;
