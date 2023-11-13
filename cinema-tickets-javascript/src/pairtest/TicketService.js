@@ -28,18 +28,19 @@ export default class TicketService {
     const ticketsByType = this.#calculationService.getTotalTicketsByType(ticketTypeRequests);
     console.log(` XXX ${JSON.stringify(ticketsByType)}`)
     logger.info(`About to validate ticket request for Account: ${accountId}. Booking comprises ${ticketsByType.ADULT} adult(s), ${ticketsByType.CHILD} child(ren) and ${ticketsByType.INFANT} infant(s)`)
-    // validate the request
+
     try {
+      // validate the request
       this.#requestValidationService.requestIdValidator(accountId);
-      this.#requestValidationService.ticketTypeRequestValidator(...ticketTypeRequests)
+      this.#requestValidationService.ticketTypeRequestValidator(...ticketTypeRequests);
+
+      // reserve seats
+
+      // make payment
+
     } catch(err) {
       logger.error(err.message);
       throw new InvalidPurchaseException(err.message)
     }
-    // reserve seats
-
-    // make payment
-
-    // throws InvalidPurchaseException
   }
 }

@@ -98,6 +98,12 @@ describe('#TicketService', () => {
         });
     });
     describe('ticket type validation', () => {
+        beforeEach(() => {
+            jest.clearAllMocks();
+        });
+        afterEach(() => {
+            jest.resetAllMocks();
+        });
         it('should throw an InvalidPurchaseException when there are no tickets requested', () => {
             const mockTicketsByType = {"ADULT": 0, "CHILD": 0, "INFANT": 0};
             jest.spyOn(CalculationService.prototype, 'getTotalTicketsByType')
