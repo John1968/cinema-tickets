@@ -22,7 +22,7 @@ export default class TicketService {
   purchaseTickets(accountId, ...ticketTypeRequests) {
     // build the request
     const ticketsByType = this.#calculationService.getTotalTicketsByType(ticketTypeRequests);
-    logger.info(`About to validate ticket request for Account:${accountId}. Booking comprises ${ticketsByType.ADULT.type} adult(s), ${ticketsByType.CHILD.type} child(ren) and ${ticketsByType.INFANT.type} infant(s)`)
+    logger.info(`About to validate ticket request for Account: ${accountId}. Booking comprises ${ticketsByType.ADULT} adult(s), ${ticketsByType.CHILD} child(ren) and ${ticketsByType.INFANT} infant(s)`)
     // validate the request
 
     // reserve seats
