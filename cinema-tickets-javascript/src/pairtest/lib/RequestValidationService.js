@@ -5,11 +5,9 @@ import { MAX_TICKETS, MIN_TICKETS } from './Config.js';
 export default class RequestValidationService {
     requestIdValidator(accountId) {
         let message
-        //  TODO not sure if these are necessary as the 'TicketTypeRequest' validates whether accountId is an integer
-        //  TODO will check when writing the tests for the ticket service errors
-        // if (!Number.isInteger(accountId)) {
-        //     message = 'The account ID must be an integer';
-        // }
+        if (!Number.isInteger(accountId)) {
+            message = 'The account ID must be an integer';
+        }
         if(accountId < 1) {
             message = 'The account ID must be greater than 0';
         }

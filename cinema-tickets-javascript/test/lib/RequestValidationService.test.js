@@ -23,14 +23,14 @@ describe('#RequestValidationService', () => {
     describe('when there are invalid parameters', () => {
         describe('when the account ID is missing or invalid', () => {
             //  TODO not sure if these are necessary as the 'TicketTypeRequest' validates whether accountId is an integer
-            // it('throws an error if the account ID is not a number', () => {
-            //     expect(() => requestValidationService.requestIdValidator('not a number'))
-            //         .toThrow(new InvalidPurchaseException('The account ID must be an integer'));
-            // });
-            // it('throws an error if the account ID is a floating point number', () => {
-            //     expect(() => requestValidationService.requestIdValidator(1.5))
-            //         .toThrow(new InvalidPurchaseException('The account ID must be an integer'));
-            // });
+            it('throws an error if the account ID is not a number', () => {
+                expect(() => requestValidationService.requestIdValidator('not a number'))
+                    .toThrow(new InvalidPurchaseException('The account ID must be an integer'));
+            });
+            it('throws an error if the account ID is a floating point number', () => {
+                expect(() => requestValidationService.requestIdValidator(1.5))
+                    .toThrow(new InvalidPurchaseException('The account ID must be an integer'));
+            });
             it('throws an error if the account ID is 0', () => {
                 expect(() => requestValidationService.requestIdValidator(0))
                     .toThrow(new InvalidPurchaseException('The account ID must be greater than 0'));
