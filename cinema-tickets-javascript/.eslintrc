@@ -1,0 +1,12 @@
+{
+  "env": {
+    "mocha": true,
+    "node": true
+  },
+  "extends": [
+    "@dwp/eslint-config-base"
+  ],
+  "rules": {
+    "no-console": "off"
+  }
+}

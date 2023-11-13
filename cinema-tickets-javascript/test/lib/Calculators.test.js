@@ -1,5 +1,5 @@
 import { expect } from'@jest/globals';
-import CalculationService from '../../src/pairtest/lib/Calculators';
+import CalculationService from '../../src/pairtest/lib/CalculationService';
 import TicketTypeRequest from '../../src/pairtest/lib/TicketTypeRequest';
 
 describe('#CalculationService', () => {
