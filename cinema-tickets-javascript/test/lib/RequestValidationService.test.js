@@ -23,7 +23,6 @@ describe('#RequestValidationService', () => {
     });
     describe('when there are invalid parameters', () => {
         describe('when the account ID is missing or invalid', () => {
-            //  TODO not sure if these are necessary as the 'TicketTypeRequest' validates whether accountId is an integer
             it('throws an error if the account ID is not a number', () => {
                 expect(() => requestValidationService.requestIdValidator('not a number'))
                     .toThrow(new InvalidPurchaseException(ERROR_MAP.ACCOUNT_ID_IS_NOT_A_NUMBER));

@@ -1,9 +1,7 @@
-// import TicketTypeRequest from './lib/TicketTypeRequest.js';
-// import InvalidPurchaseException from './lib/InvalidPurchaseException.js';
 import SeatReservationService from '../thirdparty/seatbooking/SeatReservationService';
 import TicketPaymentService from '../thirdparty/paymentgateway/TicketPaymentService';
 import logger from '../pairtest/lib/logger'
-import CalculationService from './lib/CalculationService.js';
+import CalculationService from './lib/CalculationService';
 import RequestValidationService from './lib/RequestValidationService';
 import InvalidPurchaseException from './lib/InvalidPurchaseException';
 import CurrencyService from './lib/CurrencyService';
@@ -33,7 +31,7 @@ export default class TicketService {
 
   purchaseTickets(accountId, ...ticketTypeRequests) {
     // build the request
-    this.#ticketsByType = this.#calculationService.getTotalTicketsByType(ticketTypeRequests);console.log(` XXX ${JSON.stringify(this.#ticketsByType)}`)
+    this.#ticketsByType = this.#calculationService.getTotalTicketsByType(ticketTypeRequests);
     logger.info(`About to validate ticket request for Account: ${accountId}. Booking comprises ${this.#ticketsByType.ADULT} adult(s), ${this.#ticketsByType.CHILD} child(ren) and ${this.#ticketsByType.INFANT} infant(s)`)
 
     try {
