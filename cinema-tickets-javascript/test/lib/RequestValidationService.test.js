@@ -53,7 +53,6 @@ describe('#RequestValidationService', () => {
             it('throws an error if there are more than 20 ticket requests in the booking', () => {
                 const childTicketRequest = new TicketTypeRequest('CHILD', 18);
                 const adultTicketRequest = new TicketTypeRequest('ADULT', 3);
-                const totalTicketsForBooking = childTicketRequest.getNoOfTickets() + adultTicketRequest.getNoOfTickets();
                 expect(() => requestValidationService.ticketTypeRequestValidator([childTicketRequest, adultTicketRequest]))
                     .toThrow(new InvalidPurchaseException(ERROR_MAP.NO_OF_TICKETS_OUTSIDE_BOUNDARIES));
             });
