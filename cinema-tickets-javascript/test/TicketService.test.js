@@ -7,10 +7,12 @@ import CalculationService from '../src/pairtest/lib/CalculationService';
 import TicketTypeRequest from '../src/pairtest/lib/TicketTypeRequest';
 import logger from '../src/pairtest/lib/logger'
 import { ERROR_MAP } from '../src/pairtest/lib/Config';
+import SeatReservationService from '../src/thirdparty/seatbooking/SeatReservationService';
 
 
 jest.mock('../src/pairtest/lib/logger')
 jest.mock('../src/pairtest/lib/CalculationService')
+jest.mock('../src/thirdparty/seatbooking/SeatReservationService')
 
 describe('#TicketService', () => {
     let ticketService;
@@ -26,6 +28,9 @@ describe('#TicketService', () => {
                 .mockImplementation(() => {
                     return mockTicketsByType
                 });
+
+            jest.spyOn(SeatReservationService.prototype, 'reserveSeat')
+                .mockImplementation(() => {});
             const accountId = 12345
             const fakeAdultTicketRequest = new TicketTypeRequest('ADULT', 1);
             const fakeChildTicketRequest = new TicketTypeRequest('CHILD', 1);
@@ -46,6 +51,8 @@ describe('#TicketService', () => {
     describe('accountIdValidation', () => {
         beforeEach(() => {
             ticketService = new TicketService();
+            jest.spyOn(SeatReservationService.prototype, 'reserveSeat')
+                .mockImplementation(() => {});
         });
         describe('accountId is a valid number', () => {
             it('should not throw an error if the account ID is a number greater than 0', () => {
@@ -60,7 +67,7 @@ describe('#TicketService', () => {
                 const fakeInfantTicketRequest = new TicketTypeRequest('INFANT', 1);
                 const fakeTicketTypeRequest = [fakeAdultTicketRequest, fakeChildTicketRequest, fakeInfantTicketRequest]
                 expect(() => ticketService.purchaseTickets(accountId, fakeTicketTypeRequest)).not.toThrow()
-            })
+            });
         });
         describe('accountId is NOT valid', () => {
             it('should throw an InvalidPurchaseException when the accountId < 1', () => {
@@ -160,6 +167,97 @@ describe('#TicketService', () => {
             const ticketService = new TicketService()
             expect(() => ticketService.purchaseTickets(accountId, fakeAdultTicketRequest, fakeChildTicketRequest, fakeInfantTicketRequest)).toThrow(new InvalidPurchaseException(ERROR_MAP.NO_OF_ADULTS_LESS_THAN_NO_OF_INFANTS))
             expect(logger.error).toHaveBeenCalledWith(ERROR_MAP.NO_OF_ADULTS_LESS_THAN_NO_OF_INFANTS);
+        });
+    });
+    describe('reserving the correct number of seats', () => {
+        beforeEach(() => {
+            jest.clearAllMocks()
+            ticketService = new TicketService();
+        });
+        afterEach(() => {
+            jest.resetAllMocks();
+        });
+        it('reserves a seat for each adult and child', () => {
+                const mockTicketsByType = {"ADULT": 1, "CHILD": 0, "INFANT": 0};
+                jest.spyOn(CalculationService.prototype, 'getTotalTicketsByType')
+                    .mockImplementation(() => {
+                        return mockTicketsByType
+                    });
+                const getTotalSeatsMock = jest
+                    .spyOn(CalculationService.prototype, 'getTotalSeats')
+                    .mockImplementation(() => {
+                        return 2;
+                    });
+                const seatReservationServiceMock = jest
+                    .spyOn(SeatReservationService.prototype, 'reserveSeat')
+                    .mockImplementation(() => {});
+                const accountId = 111;
+                const fakeAdultTicketRequest = new TicketTypeRequest('ADULT', 2);
+                const expectedSeatReservations = 2
+                ticketService.purchaseTickets(accountId, fakeAdultTicketRequest)
+                expect(getTotalSeatsMock).toHaveBeenCalledWith(mockTicketsByType);
+                expect(logger.info).toHaveBeenNthCalledWith(2, `about to reserve ${expectedSeatReservations} seat(s) for account ${accountId}`);
+                expect(seatReservationServiceMock).toHaveBeenCalledWith(accountId, expectedSeatReservations)
+        });
+        it('throws an error if the number of seats is not an integer', () => {
+            const mockTicketsByType = {"ADULT": 1, "CHILD": 0, "INFANT": 0};
+            jest.spyOn(CalculationService.prototype, 'getTotalTicketsByType')
+                .mockImplementation(() => {
+                    return mockTicketsByType
+            });
+            jest.spyOn(CalculationService.prototype, 'getTotalSeats')
+                .mockImplementation(() => {
+                    return 'fake-string';
+            });
+            jest.spyOn(SeatReservationService.prototype, 'reserveSeat').mockImplementation(() => {
+                throw new InvalidPurchaseException(ERROR_MAP.NO_OF_SEATS_IS_NOT_AN_INTEGER)
+            });
+
+            const accountId = 12345
+            const fakeAdultTicketRequest = new TicketTypeRequest('ADULT', 1);
+            expect(() => ticketService.purchaseTickets(accountId, fakeAdultTicketRequest)).toThrow(new InvalidPurchaseException(ERROR_MAP.NO_OF_SEATS_IS_NOT_AN_INTEGER))
+            expect(logger.error).toHaveBeenCalledWith(ERROR_MAP.NO_OF_SEATS_IS_NOT_AN_INTEGER);
+        });
+    });
+    describe('calculating the cost of the booking', () => {
+        beforeEach(() => {
+            jest.clearAllMocks()
+            ticketService = new TicketService();
+        });
+        afterEach(() => {
+            jest.resetAllMocks();
+        });
+        it('calculates the cost of the booking', () => {
+            const mockTicketsByType = {"ADULT": 1, "CHILD": 0, "INFANT": 0};
+            jest.spyOn(CalculationService.prototype, 'getTotalTicketsByType')
+                .mockImplementation(() => {
+                    return mockTicketsByType
+                });
+           jest.spyOn(CalculationService.prototype, 'getTotalSeats')
+                .mockImplementation(() => {
+                    return 2;
+                });
+           const mockTotalTickets = 2
+            const getTotalTicketsTicketCount = jest
+                .spyOn(CalculationService.prototype, 'getTotalTicketCount')
+                .mockImplementation(() => {
+                    return mockTotalTickets
+                })
+
+            const mockTotalCost = 20
+            const getTotalBookingCostMock = jest
+                .spyOn(CalculationService.prototype, 'getTotalBookingCost')
+                .mockImplementation(() => {
+                    return mockTotalCost
+                })
+            jest.spyOn(SeatReservationService.prototype, 'reserveSeat')
+                .mockImplementation(() => {});
+            const accountId = 111;
+            const fakeAdultTicketRequest = new TicketTypeRequest('ADULT', 2);
+            ticketService.purchaseTickets(accountId, fakeAdultTicketRequest)
+            expect(getTotalTicketsTicketCount).toHaveBeenCalledWith(mockTicketsByType);
+            expect(logger.info).toHaveBeenNthCalledWith(3, `About to purchase ${mockTotalTickets} tickets`);
+            expect(getTotalBookingCostMock).toHaveBeenCalledWith(mockTicketsByType)
         });
     });
 });

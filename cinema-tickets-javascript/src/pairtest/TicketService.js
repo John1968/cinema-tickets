@@ -14,7 +14,11 @@ export default class TicketService {
   #calculationService
   #seatReservationService
   #requestValidationService
+  #seatsRequired
+  #ticketsByType
   #ticketPaymentService
+  #totalTicketsToPurchase
+  #totalAmountToPay
 
   constructor() {
     this.#calculationService = new CalculationService();
@@ -25,9 +29,9 @@ export default class TicketService {
 
   purchaseTickets(accountId, ...ticketTypeRequests) {
     // build the request
-    const ticketsByType = this.#calculationService.getTotalTicketsByType(ticketTypeRequests);
-    console.log(` XXX ${JSON.stringify(ticketsByType)}`)
-    logger.info(`About to validate ticket request for Account: ${accountId}. Booking comprises ${ticketsByType.ADULT} adult(s), ${ticketsByType.CHILD} child(ren) and ${ticketsByType.INFANT} infant(s)`)
+    this.#ticketsByType = this.#calculationService.getTotalTicketsByType(ticketTypeRequests);
+    console.log(` XXX ${JSON.stringify(this.#ticketsByType)}`)
+    logger.info(`About to validate ticket request for Account: ${accountId}. Booking comprises ${this.#ticketsByType.ADULT} adult(s), ${this.#ticketsByType.CHILD} child(ren) and ${this.#ticketsByType.INFANT} infant(s)`)
 
     try {
       // validate the request
@@ -35,6 +39,14 @@ export default class TicketService {
       this.#requestValidationService.ticketTypeRequestValidator(...ticketTypeRequests);
 
       // reserve seats
+      this.#seatsRequired = this.#calculationService.getTotalSeats(this.#ticketsByType);
+      logger.info(`about to reserve ${this.#seatsRequired} seat(s) for account ${accountId}`);
+      this.#seatReservationService.reserveSeat(accountId, this.#seatsRequired);
+
+      // calculate cost
+      this.#totalTicketsToPurchase = this.#calculationService.getTotalTicketCount(this.#ticketsByType);
+      logger.info(`About to purchase ${this.#totalTicketsToPurchase} tickets`);
+      this.#totalAmountToPay = this.#calculationService.getTotalBookingCost( this.#ticketsByType );
 
       // make payment
 
