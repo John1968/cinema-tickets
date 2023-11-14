@@ -1,5 +1,7 @@
 import {expect, jest} from '@jest/globals';
 import CurrencyService from '../../src/pairtest/lib/CurrencyService';
+import InvalidPurchaseException from "../../src/pairtest/lib/InvalidPurchaseException.js";
+import {ERROR_MAP} from "../../src/pairtest/lib/Config.js";
 
 
 
@@ -12,15 +14,8 @@ describe('CurrencyService', () => {
         expect(result).toEqual('£10.00');
     });
 
-    it('should return a price in pound when passed an floating point number', () => {
-        const currencyService = new CurrencyService();
-        const result = currencyService.getPriceInPounds(1.15);
-        expect(result).toEqual('£1.15');
-    });
-
     it('should log an error when the parameter is not a number', () => {
         const currencyService = new CurrencyService();
-        const result = currencyService.getPriceInPounds('not-a-number');
-        expect(result).toEqual('£NaN');
+        expect(() => currencyService.getPriceInPounds('not-a-number')).toThrow(new InvalidPurchaseException(ERROR_MAP.COST_NOT_AN_INTEGER));
     });
 });
