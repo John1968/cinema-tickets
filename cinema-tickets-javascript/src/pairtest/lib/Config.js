@@ -23,9 +23,18 @@ export const ERROR_MAP = {
     NO_ADULTS_INCLUDED: 'Your reservation must contain at least 1 adult',
     NO_OF_ADULTS_LESS_THAN_NO_OF_INFANTS:'There must be an ADULT for every INFANT in the booking',
     NO_OF_SEATS_IS_NOT_AN_INTEGER: 'totalSeatsToAllocate must be an integer',
+    COST_NOT_AN_INTEGER: 'cost of booking must be an integer'
 }
 export const TICKET_COST_BY_TYPE = {
     ADULT: 20,
     CHILD: 10,
     INFANT: 0,
+};
+
+export const CURRENCY_FORMAT = {
+    'GB':
+        {
+            'locale': 'en-GB',
+            'currency': 'GBP',
+        }
 };

@@ -6,15 +6,18 @@ import logger from '../pairtest/lib/logger'
 import CalculationService from './lib/CalculationService.js';
 import RequestValidationService from './lib/RequestValidationService';
 import InvalidPurchaseException from './lib/InvalidPurchaseException';
+import CurrencyService from './lib/CurrencyService';
 
 export default class TicketService {
   /**
    * Should only have private methods other than the one below.
    */
   #calculationService
-  #seatReservationService
+  #currencyService
+  #priceInPounds
   #requestValidationService
   #seatsRequired
+  #seatReservationService
   #ticketsByType
   #ticketPaymentService
   #totalTicketsToPurchase
@@ -23,14 +26,14 @@ export default class TicketService {
   constructor() {
     this.#calculationService = new CalculationService();
     this.#seatReservationService = new SeatReservationService();
-    this.#requestValidationService = new RequestValidationService()
+    this.#requestValidationService = new RequestValidationService();
     this.#ticketPaymentService = new TicketPaymentService();
+    this.#currencyService = new CurrencyService();
   }
 
   purchaseTickets(accountId, ...ticketTypeRequests) {
     // build the request
-    this.#ticketsByType = this.#calculationService.getTotalTicketsByType(ticketTypeRequests);
-    console.log(` XXX ${JSON.stringify(this.#ticketsByType)}`)
+    this.#ticketsByType = this.#calculationService.getTotalTicketsByType(ticketTypeRequests);console.log(` XXX ${JSON.stringify(this.#ticketsByType)}`)
     logger.info(`About to validate ticket request for Account: ${accountId}. Booking comprises ${this.#ticketsByType.ADULT} adult(s), ${this.#ticketsByType.CHILD} child(ren) and ${this.#ticketsByType.INFANT} infant(s)`)
 
     try {
@@ -49,6 +52,14 @@ export default class TicketService {
       this.#totalAmountToPay = this.#calculationService.getTotalBookingCost( this.#ticketsByType );
 
       // make payment
+      this.#ticketPaymentService.makePayment(accountId, this.#totalAmountToPay);
+
+      // convert cost to currency
+      this.#priceInPounds = this.#currencyService.getPriceInPounds(this.#totalAmountToPay);
+      logger.info(this.#priceInPounds);
+
+      //  confirm booking
+      logger.info(`${this.#seatsRequired} seat(s) have been reserved\n The booking is confirmed at a cost of ${this.#priceInPounds}`)
 
     } catch(err) {
       logger.error(err.message);
